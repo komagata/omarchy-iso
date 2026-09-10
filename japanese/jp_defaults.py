@@ -35,6 +35,12 @@ Layout=
 [GroupOrder]
 0=Default
 ''')
+    config_path = home / '.config/omarchy/shell.json'
+    config = json.loads(config_path.read_text()) if config_path.exists() else {'version': 1, 'bar': {'layout': {'right': []}}}
+    widgets = config['bar']['layout']['right']
+    if not any(w.get('id') == 'komagata.input-method' for w in widgets):
+        widgets.insert(0, {'id': 'komagata.input-method'})
+    write(home, '.config/omarchy/shell.json', json.dumps(config, ensure_ascii=False, indent=2) + '\n')
     write(home, '.local/state/omarchy/done/jp-defaults-v1', '')
     return True
 
@@ -55,6 +61,8 @@ def main():
             vconsole = Path('/etc/vconsole.conf')
             if vconsole.exists() and 'jp' in vconsole.read_text():
                 layout = 'jp'
+        plugin = home / '.config/omarchy/plugins/komagata.input-method'
+        shutil.copytree(ASSETS / 'input-method', plugin, dirs_exist_ok=True)
         configure_user(home, layout)
         return
     if os.geteuid() != 0:

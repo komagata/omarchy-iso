@@ -12,4 +12,8 @@ class DefaultsTest(unittest.TestCase):
  def test_japanese_input_keeps_physical_keyboard(self):
   self.apply('jp'); p=(self.home/'.config/fcitx5/profile').read_text()
   self.assertIn('Default Layout=jp',p); self.assertIn('Name=keyboard-jp',p); self.assertIn('Name=mozc',p)
+ def test_plugin_insert_preserves_existing_bar(self):
+  p=self.home/'.config/omarchy/shell.json'; p.parent.mkdir(parents=True); p.write_text(json.dumps({'version':1,'bar':{'layout':{'right':[{'id':'omarchy.audio'}]}}}))
+  self.apply(); c=json.loads(p.read_text()); ids=[x['id'] for x in c['bar']['layout']['right']]
+  self.assertEqual(ids,['komagata.input-method','omarchy.audio'])
 if __name__=='__main__': unittest.main()
