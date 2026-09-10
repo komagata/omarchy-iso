@@ -72,7 +72,7 @@ python "$scripts/configure_iso.py" "$root"
 cp "$scripts/jp.py" "$root/usr/share/omarchy-iso/orchestrator/jp.py"
 assets="$root/usr/local/share/omarchy-jp"
 mkdir -p "$assets/input-method"
-cp "$scripts/"{jp_defaults.py,voxtype.service,omarchy-jp-defaults.service} "$assets/"
+cp "$scripts/"{jp_defaults.py,voxtype.service} "$assets/"
 cp "$downloads/ggml-small.bin" "$assets/"
 cp "$scripts/WHISPER-LICENSE" "$assets/"
 # Keep public Git metadata so the standard plugin updater remains usable.

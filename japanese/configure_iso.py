@@ -6,13 +6,6 @@ import sys
 EXTRA_PACKAGES = ('fcitx5-mozc', 'fcitx5-configtool', 'voxtype-bin', 'wtype', 'wl-clipboard', 'noto-fonts-cjk')
 
 def patch_iso(root):
-    configurator = root / 'root/configurator'
-    text = configurator.read_text()
-    old = '"sys_lang": "en_US.UTF-8"'
-    # Full-disk and pre-mounted installation configurations both set locale.
-    if text.count(old) != 2:
-        raise ValueError('Unexpected stable ISO locale configuration')
-    configurator.write_text(text.replace(old, '"sys_lang": "ja_JP.UTF-8"'))
     packages = root / 'usr/share/omarchy-iso/omarchy-base.packages'
     lines = packages.read_text().splitlines()
     for name in EXTRA_PACKAGES:

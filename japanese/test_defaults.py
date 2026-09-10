@@ -9,6 +9,20 @@ class DefaultsTest(unittest.TestCase):
   self.assertTrue(SCRIPT.exists(),'JP defaults initializer has not been implemented')
   spec=importlib.util.spec_from_file_location('jp_defaults',SCRIPT); m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
   m.configure_user(self.home,layout)
+ def test_locale_is_user_owned_and_shared_by_session_loaders(self):
+  self.apply()
+  locale=self.home/'.config/locale.conf'
+  self.assertTrue(locale.exists())
+  self.assertEqual(locale.read_text(), 'LANG=ja_JP.UTF-8\n')
+  env=self.home/'.config/environment.d/20-omarchy-jp.conf'
+  self.assertEqual(env.resolve(), locale)
+  import subprocess,os
+  env_vars=dict(os.environ, HOME=str(self.home), XDG_CONFIG_HOME=str(self.home/'.config'), LANG='en_US.UTF-8')
+  result=subprocess.check_output(['sh','-c','. "$HOME/.config/uwsm/env.d/20-omarchy-jp"; printf "%s" "$LANG"'],env=env_vars,text=True)
+  self.assertEqual(result,'ja_JP.UTF-8')
+  locale.write_text('LANG=en_US.UTF-8\n')
+  self.apply()
+  self.assertEqual(locale.read_text(),'LANG=en_US.UTF-8\n')
  def test_japanese_input_keeps_physical_keyboard(self):
   self.apply('jp'); p=(self.home/'.config/fcitx5/profile').read_text()
   self.assertIn('Default Layout=jp',p); self.assertIn('Name=keyboard-jp',p); self.assertIn('Name=mozc',p)

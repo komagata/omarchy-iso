@@ -4,7 +4,7 @@ Japanese ISO based on the official Omarchy 4.0.3 ISO. This is not an official Om
 
 ## Defaults
 
-- System locale: `ja_JP.UTF-8`.
+- User locale: `ja_JP.UTF-8` for the account created by the installer. The upstream system locale remains unchanged.
 - Physical keyboard layout: chosen during installation, independent of the locale.
 - Japanese input: Fcitx 5 + Mozc; Ctrl+Space switches input methods.
 - Input Methods bar plugin: `komagata.input-method`, v0.1.9 (commit `292ad4b2d90c1f6fddd2cc9aadaf00216f242ac6`).
@@ -13,7 +13,7 @@ Japanese ISO based on the official Omarchy 4.0.3 ISO. This is not an official Om
 - Dictation: hold F9, or toggle with Super+Ctrl+X.
 - Output: paste mode using Ctrl+Shift+V (terminal paste / browser plain-text paste).
 
-The system locale also selects Japanese translations in applications that supply them. This overlay contains no translation of Omarchy's own shell strings.
+The user locale also selects Japanese translations in applications that supply them. This overlay contains no translation of Omarchy's own shell strings.
 
 ## Build
 
@@ -44,7 +44,11 @@ Input assets:
 
 The original ISO's offline package mirror has priority during dependency resolution. The build verifies that every original package remains byte-for-byte identical, adds the Japanese packages and payload, then recreates the SquashFS and replays the original BIOS/UEFI boot metadata. The original signature does not apply to this modified image; use the accompanying JP SHA256.
 
-The installed payload lives at `/usr/local/share/omarchy-jp`. `omarchy-jp-defaults.service` initializes new users before the display manager starts. Once the per-user marker `~/.local/state/omarchy/done/jp-defaults-v1` exists, subsequent boots preserve the user's settings.
+Packages and the model are shared system resources; the payload lives at `/usr/local/share/omarchy-jp`. The installer generates the Japanese locale data without changing `/etc/locale.conf`, then initializes only its selected account. There is no boot-time scan of users, and subsequently created accounts receive no JP defaults. Deferred provisioning without an installation user is not supported by this overlay.
+
+The user's language is stored in `~/.config/locale.conf`. A symlink at `~/.config/environment.d/20-omarchy-jp.conf` supplies it to user services, and `~/.config/uwsm/env.d/20-omarchy-jp` loads it for the desktop session. Edit the locale file and log out and back in to change the desktop language. Input method, plugin, and dictation settings remain under the user's `~/.config`. The marker `~/.local/state/omarchy/done/jp-defaults-v1` prevents repeated initialization from overwriting personal choices.
+
+This is a fresh-install change. Previously built ISOs and existing installations retain their former system-wide defaults until separately migrated.
 
 ## Tests
 
@@ -56,7 +60,7 @@ End-to-end verification uses a separate QEMU/KVM VM and a disposable 64GB disk. 
 
 ## Review scope
 
-This branch preserves the official builder and adds an opt-in Japanese ISO build workflow under `japanese`. `configure_iso.py` contains the installer changes: both generated locale configurations, additional offline packages, and the Japanese setup phase. `jp.py` installs the system payload; `jp_defaults.py` initializes each user once.
+This branch preserves the official builder and adds an opt-in Japanese ISO build workflow under `japanese`. `configure_iso.py` contains the installer changes: additional offline packages and the Japanese setup phase. `jp.py` installs the system payload; `jp_defaults.py` initializes the installation user once.
 
 The base ISO is pinned to 4.0.3 rather than rebuilding from a moving package channel. A future upstream PR may move these settings into a shared locale/profile mechanism; this branch records the implementation used for the Japanese ISO without choosing that API in advance.
 
@@ -67,5 +71,7 @@ The original Japanese ISO was installed into a fresh QEMU/KVM UEFI VM on 2026-09
 On 2026-09-10, commit `fb2a34475105de935dd1f94ddea72641f96c584b` was rebuilt using `japanese/build.sh` from this fork, then installed into another fresh 64GB QEMU/KVM UEFI disk (8 vCPUs, 8GB RAM). The build and ISO checksum check passed. The initial desktop session passed locale, package, service, plugin, Mozc conversion, and local Whisper-to-paste checks. A 5.2-second virtual-microphone recording was transcribed in 3.97 seconds on CPU and pasted into Foot as `水をマレーシアから買わなくてはならないのです。`. After reboot, the Japanese defaults, plugin, and both user services remained active, and the Voxtype configuration hash was unchanged. The test VM used `virtio-vga,edid=off` and a 1280x768 desktop to avoid a QEMU capture issue at its automatically selected width; these display adjustments are not part of the ISO.
 
 Rebuilt artifact SHA256: `66dc188e4db0da7a396b4b81aeed07b44e8b610940dbac2f214ea50e5cccabea` (`omarchy-4.0.3.jp.iso`). Timestamps and package mirror availability mean rebuilding is not guaranteed to produce identical ISO bytes.
+
+On 2026-09-11, the per-user revision passed nine automated tests and was applied to a new account in the existing 4.0.3 test VM. With the system locale set to English, the actual Hyprland, Fcitx5, and Voxtype processes used `ja_JP.UTF-8`, including after reboot. A second account received no JP configuration. This check used the installed VM and updated initializer, not a rebuilt ISO or a fresh end-to-end installation. The earlier ISO checksum above identifies the previous system-wide version.
 
 Physical microphones, GPUs, Wi-Fi devices, and other hardware-specific behavior have not been tested. No test credentials, SSH keys, audio fixtures, ISO files, or model binaries are committed.
