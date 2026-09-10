@@ -1,0 +1,13 @@
+[Unit]
+Description=Voxtype Japanese offline dictation
+PartOf=graphical-session.target
+After=graphical-session.target pipewire.service pipewire-pulse.service
+ConditionEnvironment=WAYLAND_DISPLAY
+[Service]
+Type=simple
+ExecStart=/usr/bin/voxtype daemon
+Restart=on-failure
+RestartSec=5
+Environment=XDG_RUNTIME_DIR=%t
+[Install]
+WantedBy=graphical-session.target

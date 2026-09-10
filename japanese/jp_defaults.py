@@ -35,12 +35,43 @@ Layout=
 [GroupOrder]
 0=Default
 ''')
+    write(home, '.config/voxtype/config.toml', '''engine = "whisper"
+state_file = "auto"
+[hotkey]
+enabled = false
+[audio]
+device = "default"
+sample_rate = 16000
+max_duration_secs = 60
+pause_media = true
+[whisper]
+model = "small"
+language = "ja"
+translate = false
+[output]
+mode = "paste"
+paste_keys = "ctrl+shift+v"
+fallback_to_clipboard = true
+[output.notification]
+on_recording_start = false
+on_recording_stop = false
+on_transcription = false
+''')
+    model = home / '.local/share/voxtype/models/ggml-small.bin'
+    model.parent.mkdir(parents=True, exist_ok=True)
+    if not model.exists() and not model.is_symlink():
+        model.symlink_to(ASSETS / 'ggml-small.bin')
     config_path = home / '.config/omarchy/shell.json'
     config = json.loads(config_path.read_text()) if config_path.exists() else {'version': 1, 'bar': {'layout': {'right': []}}}
     widgets = config['bar']['layout']['right']
     if not any(w.get('id') == 'komagata.input-method' for w in widgets):
         widgets.insert(0, {'id': 'komagata.input-method'})
     write(home, '.config/omarchy/shell.json', json.dumps(config, ensure_ascii=False, indent=2) + '\n')
+    service = home / '.config/systemd/user/graphical-session.target.wants/voxtype.service'
+    service.parent.mkdir(parents=True, exist_ok=True)
+    if not service.is_symlink():
+        service.symlink_to('/etc/systemd/user/voxtype.service')
+    write(home, '.local/state/omarchy/done/voxtype-install-invitation', '')
     write(home, '.local/state/omarchy/done/jp-defaults-v1', '')
     return True
 
