@@ -2,6 +2,17 @@
 
 Japanese ISO based on the official Omarchy 4.0.3 ISO. This is not an official Omarchy release.
 
+## Download
+
+- [Download the VM-tested ISO](https://storage.googleapis.com/komagata-omarchy-iso/4.0.3-jp.1/omarchy-4.0.3.jp.iso)
+- [SHA-256 checksum](https://storage.googleapis.com/komagata-omarchy-iso/4.0.3-jp.1/omarchy-4.0.3.jp.iso.sha256)
+
+This single-file build uses source commit `190c48482e595e3e76d8afe77503cd46e4871dd6` and applies Japanese settings only to the installation user. After downloading both files to the same directory, verify the ISO:
+
+```sh
+sha256sum -c omarchy-4.0.3.jp.iso.sha256
+```
+
 ## Defaults
 
 - User locale: `ja_JP.UTF-8` for the account created by the installer. The upstream system locale remains unchanged.
