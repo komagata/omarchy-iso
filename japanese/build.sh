@@ -4,7 +4,7 @@ set -euo pipefail
 scripts=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 repo=$(cd -- "$scripts/.." && pwd)
 downloads="$repo/release/jp-downloads"
-source_iso="$downloads/omarchy-4.0.3.iso"
+source_iso="$downloads/omarchy-4.0.4.iso"
 build=${OMARCHY_JP_BUILD_DIR:-/var/tmp/omarchy-jp-build}
 if (( EUID != 0 )); then
   echo 'Run this script as root inside a disposable Arch Linux build VM.' >&2
@@ -15,7 +15,7 @@ if [[ -e $build ]]; then
   exit 1
 fi
 mkdir -p "$build"
-printf '%s  %s\n' 03d60bc74306dca51f96e1a84b690871d8d606826b260edd0208962da8507d14 "$source_iso" | sha256sum -c -
+printf '%s  %s\n' ddeded2758c48318d201dfdac905ecb28f570441883f0c052ea3cd5d05acf92d "$source_iso" | sha256sum -c -
 printf '%s  %s\n' 1be3a9b2063867b937e64e2ec7483364a79917e157fa98c5d94b5c1fffea987b "$downloads/ggml-small.bin" | sha256sum -c -
 xorriso -osirrox on -indev "$source_iso" -extract /arch/x86_64/airootfs.sfs "$build/original.sfs"
 unsquashfs -processors 6 -d "$build/root" "$build/original.sfs"
@@ -67,7 +67,7 @@ changed={name:(version,after.get(name)) for name,version in before.items() if ve
 assert not changed, f'Stable package versions changed: {changed}'
 print(f'Preserved {len(before)} original package versions')
 PYVERIFY
-grep '^omarchy 4.0.3-1$' "$build/packages.txt"
+grep '^omarchy 4.0.4-1$' "$build/packages.txt"
 python "$scripts/configure_iso.py" "$root"
 cp "$scripts/jp.py" "$root/usr/share/omarchy-iso/orchestrator/jp.py"
 assets="$root/usr/local/share/omarchy-jp"
@@ -79,11 +79,11 @@ cp "$scripts/WHISPER-LICENSE" "$assets/"
 git clone https://github.com/komagata/omarchy-input-method.git "$assets/input-method"
 git -C "$assets/input-method" checkout 292ad4b2d90c1f6fddd2cc9aadaf00216f242ac6
 cp "$build/packages.txt" "$assets/packages.txt"
-printf '%s\n' 'Omarchy Japanese ISO based on official 4.0.3' 'Input Methods v0.1.9 292ad4b2d90c1f6fddd2cc9aadaf00216f242ac6' 'Whisper small 1be3a9b2063867b937e64e2ec7483364a79917e157fa98c5d94b5c1fffea987b' > "$assets/build-info.txt"
+printf '%s\n' 'Omarchy Japanese ISO based on official 4.0.4' 'Input Methods v0.1.9 292ad4b2d90c1f6fddd2cc9aadaf00216f242ac6' 'Whisper small 1be3a9b2063867b937e64e2ec7483364a79917e157fa98c5d94b5c1fffea987b' > "$assets/build-info.txt"
 python -m py_compile "$assets/jp_defaults.py" "$root/usr/share/omarchy-iso/orchestrator/jp.py" "$root/usr/share/omarchy-iso/orchestrator/main.py"
 mksquashfs "$root" "$build/airootfs.sfs" -comp zstd -Xcompression-level 15 -b 1M -noappend -processors 6 > "$build/mksquashfs.log" 2>&1
 (cd "$build" && sha512sum airootfs.sfs > airootfs.sha512)
-xorriso -indev "$source_iso" -outdev "$build/omarchy-4.0.3.jp.iso" -boot_image any replay -map "$build/airootfs.sfs" /arch/x86_64/airootfs.sfs -map "$build/airootfs.sha512" /arch/x86_64/airootfs.sha512 -commit
-(cd "$build" && sha256sum omarchy-4.0.3.jp.iso > omarchy-4.0.3.jp.iso.sha256)
-xorriso -indev "$build/omarchy-4.0.3.jp.iso" -report_el_torito plain -report_system_area plain > "$build/boot-layout.txt" 2>&1
-printf '\nJP ISO build complete: %s\n' "$build/omarchy-4.0.3.jp.iso"
+xorriso -indev "$source_iso" -outdev "$build/omarchy-4.0.4.jp.iso" -boot_image any replay -map "$build/airootfs.sfs" /arch/x86_64/airootfs.sfs -map "$build/airootfs.sha512" /arch/x86_64/airootfs.sha512 -commit
+(cd "$build" && sha256sum omarchy-4.0.4.jp.iso > omarchy-4.0.4.jp.iso.sha256)
+xorriso -indev "$build/omarchy-4.0.4.jp.iso" -report_el_torito plain -report_system_area plain > "$build/boot-layout.txt" 2>&1
+printf '\nJP ISO build complete: %s\n' "$build/omarchy-4.0.4.jp.iso"

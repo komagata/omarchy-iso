@@ -1,17 +1,14 @@
-# Omarchy 4.0.3 Japanese ISO
+# Omarchy 4.0.4 Japanese ISO
 
-Japanese ISO based on the official Omarchy 4.0.3 ISO. This is not an official Omarchy release.
+Japanese ISO based on the official Omarchy 4.0.4 ISO. This is not an official Omarchy release.
 
 ## Download
 
-- [Download the VM-tested ISO](https://storage.googleapis.com/komagata-omarchy-iso/4.0.3-jp.1/omarchy-4.0.3.jp.iso)
-- [SHA-256 checksum](https://storage.googleapis.com/komagata-omarchy-iso/4.0.3-jp.1/omarchy-4.0.3.jp.iso.sha256)
+The 4.0.4 Japanese ISO has been built locally. It has not been published.
+The previous VM-tested 4.0.3 build remains available:
 
-This single-file build uses source commit `190c48482e595e3e76d8afe77503cd46e4871dd6` and applies Japanese settings only to the installation user. After downloading both files to the same directory, verify the ISO:
-
-```sh
-sha256sum -c omarchy-4.0.3.jp.iso.sha256
-```
+- [Download 4.0.3 JP](https://storage.googleapis.com/komagata-omarchy-iso/4.0.3-jp.1/omarchy-4.0.3.jp.iso)
+- [4.0.3 JP SHA-256](https://storage.googleapis.com/komagata-omarchy-iso/4.0.3-jp.1/omarchy-4.0.3.jp.iso.sha256)
 
 ## Defaults
 
@@ -45,8 +42,8 @@ Input assets:
 
 | Asset | Source / pinned SHA256 |
 |---|---|
-| Official ISO | https://iso.omarchy.org/omarchy-4.0.3.iso |
-| ISO SHA256 | `03d60bc74306dca51f96e1a84b690871d8d606826b260edd0208962da8507d14` |
+| Official ISO | https://iso.omarchy.org/omarchy-4.0.4.iso |
+| ISO SHA256 | `ddeded2758c48318d201dfdac905ecb28f570441883f0c052ea3cd5d05acf92d` |
 | Whisper small | https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-small.bin |
 | Model SHA256 | `1be3a9b2063867b937e64e2ec7483364a79917e157fa98c5d94b5c1fffea987b` |
 | Voxtype package | https://pkgs.omarchy.org/stable/x86_64/voxtype-bin-1.0.1-1-x86_64.pkg.tar.zst |
@@ -73,9 +70,13 @@ End-to-end verification uses a separate QEMU/KVM VM and a disposable 64GB disk. 
 
 This branch preserves the official builder and adds an opt-in Japanese ISO build workflow under `japanese`. `configure_iso.py` contains the installer changes: additional offline packages and the Japanese setup phase. `jp.py` installs the system payload; `jp_defaults.py` initializes the installation user once.
 
-The base ISO is pinned to 4.0.3 rather than rebuilding from a moving package channel. A future upstream PR may move these settings into a shared locale/profile mechanism; this branch records the implementation used for the Japanese ISO without choosing that API in advance.
+The base ISO is pinned to 4.0.4 rather than rebuilding from a moving package channel. A future upstream PR may move these settings into a shared locale/profile mechanism; this branch records the implementation used for the Japanese ISO without choosing that API in advance.
 
 ## Validation record
+
+On 2026-09-17, the overlay was rebuilt from the official 4.0.4 ISO, SHA256 `ddeded2758c48318d201dfdac905ecb28f570441883f0c052ea3cd5d05acf92d`. All 1,248 upstream package versions and package hashes were preserved, including `linux-omarchy 7.2.5-3`. Nine source tests passed. The completed ISO's SquashFS was extracted and matched the verified build filesystem byte for byte; the ISO hash was verified again after copying to the host.
+
+The resulting `omarchy-4.0.4.jp.iso` is 7,015,038,976 bytes with SHA256 `109ce925e91ea061ab7dfaa40ecebc0b4f70ae134ea008f0739782ececb8e3bc`. A fresh QEMU/KVM UEFI install passed with the 4.0.4 default `linux-omarchy` kernel. Mozc converted `nihongo` to `日本語`; local Whisper transcribed a virtual microphone recording in 3.96 seconds and pasted it into Foot. The system and second account remained English. Disk-only boot with GTK display and a normal OS reboot passed; Japanese settings/services and configuration hashes were retained. A headless boot attempt encountered a Plymouth timeout; its cause remains unconfirmed. Physical hardware is untested.
 
 The original Japanese ISO was installed into a fresh QEMU/KVM UEFI VM on 2026-09-09. The desktop locale, automatic Fcitx/Voxtype startup, plugin validation, Mozc conversion (`nihongo` to `日本語`), and Japanese audio recording through a virtual microphone followed by clipboard paste into Foot were verified. Whisper ran locally on CPU, without an API key. All 1,249 original package versions and package file hashes were preserved. The final image also booted to the installer welcome screen in BIOS mode.
 
@@ -85,6 +86,6 @@ Rebuilt artifact SHA256: `66dc188e4db0da7a396b4b81aeed07b44e8b610940dbac2f214ea5
 
 On 2026-09-11, source commit `190c48482e595e3e76d8afe77503cd46e4871dd6` was rebuilt and installed from the resulting ISO into a fresh 64GB QEMU/KVM UEFI disk (8 vCPUs, 8GB RAM). Nine automated tests passed. The installer completed, preserving `en_US.UTF-8` for the system and setting `ja_JP.UTF-8` only for the installation user. Mozc converted `nihongo` to `日本語`. The Input Methods plugin validated, and Fcitx and Voxtype started automatically. Local Whisper transcribed a Japanese virtual-microphone recording in 3.91 seconds on CPU and pasted the result into Foot. A second account retained English and received no JP settings. Disk-only boot with the ISO removed and a normal OS reboot both passed. Locale, Voxtype, and shell configuration hashes remained unchanged; Fcitx added comments when saving its profile, with its US keyboard and Mozc selection unchanged.
 
-Current per-user ISO SHA256: `68311f887589a0db5316e689168ec5e9e379f3615c4e510f6622f612437edcf2` (`omarchy-4.0.3.jp.iso`). All 1,249 original package versions and package file hashes were preserved. The completed ISO filesystem was extracted and compared byte-for-byte with the verified build filesystem, and the ISO checksum was rechecked after copying to the host. This checksum supersedes the earlier system-wide build above.
+The 4.0.3 per-user ISO SHA256: `68311f887589a0db5316e689168ec5e9e379f3615c4e510f6622f612437edcf2` (`omarchy-4.0.3.jp.iso`). All 1,249 original package versions and package file hashes were preserved. The completed ISO filesystem was extracted and compared byte-for-byte with the verified build filesystem, and the ISO checksum was rechecked after copying to the host. This checksum supersedes the earlier system-wide build above.
 
 Physical microphones, GPUs, Wi-Fi devices, and other hardware-specific behavior have not been tested. No test credentials, SSH keys, audio fixtures, ISO files, or model binaries are committed.

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-"""Apply the small JP overlay to an extracted, verified Omarchy 4.0.3 ISO."""
+"""Apply the small JP overlay to an extracted, verified Omarchy 4.0.4 ISO."""
 from pathlib import Path
 import sys
 
